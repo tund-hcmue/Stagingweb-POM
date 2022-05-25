@@ -10,11 +10,5 @@
         "make": "BMW",
         "model": "Z4",
         "zipcode": "12345"
-    },
-    {
-        "year": "2015",
-        "make": "Honda",
-        "model": "CR-V",
-        "zipcode": "12345"
     }
 ]

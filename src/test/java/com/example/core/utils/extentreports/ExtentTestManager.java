@@ -16,6 +16,15 @@ public class ExtentTestManager {
     
     static Map<Integer, ExtentTest> extentTestMap = new HashMap<Integer, ExtentTest>();
 	static ExtentReports extent = ExtentManager.getInstance();
+    private static final ThreadLocal<String> categoryName = new ThreadLocal<>();
+
+    public static ThreadLocal<String> getCategoryName() {
+        return categoryName;
+    }
+
+    public static void setCategoryName(String categoryName) {
+        getCategoryName().set(categoryName);
+    }
 
 	public static synchronized ExtentTest getTest() {
 		return (ExtentTest) extentTestMap.get((int) (long) (Thread.currentThread().getId()));
@@ -31,12 +40,7 @@ public class ExtentTestManager {
 		return test;
 	}
 
-    // public static void addScreenShot(String message) {
-    //     String base64Image = "data:image/png;base64,"
-    //             + ((TakesScreenshot) BaseTest.getDriver()).getScreenshotAs(OutputType.BASE64);
-    //     getTest().log(Status.INFO, message,
-    //             getTest().addScreenCaptureFromBase64String(base64Image).getModel().getMedia().get(0));
-    // }
+
 
     public static void addScreenShot(Status status, String message) {
 
@@ -46,12 +50,9 @@ public class ExtentTestManager {
                 getTest().addScreenCaptureFromBase64String(base64Image).getModel().getMedia().get(0));
     }
 
-    // public static void logMessage(String message) {
-    //     getTest().log(Status.INFO, message);
-    // }
-
     public static void logMessage(Status status, String message) {
         getTest().log(status, message);
     }
+  
 
 }

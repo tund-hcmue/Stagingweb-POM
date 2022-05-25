@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
 
 
 public class ExtentManager {
@@ -25,6 +26,7 @@ public class ExtentManager {
         String fileName = getReportPath(reportFilepath);
        
         ExtentSparkReporter reporter = new ExtentSparkReporter(fileName);
+        reporter.config().setTheme(Theme.DARK);
         reporter.config().setDocumentTitle(reportFileName);
         reporter.config().setEncoding("utf-8");
         reporter.config().setReportName(reportFileName);
@@ -32,9 +34,11 @@ public class ExtentManager {
  
         extent = new ExtentReports();
         extent.attachReporter(reporter);
-        //Set environment details
-		extent.setSystemInfo("OS", "Linux");
-		extent.setSystemInfo("AUT", "TunD20");
+        extent.setSystemInfo("OS",  System.getProperty("os.name"));
+        extent.setSystemInfo("Java",  System.getProperty("java.specification.version"));
+        extent.setSystemInfo("User",  System.getProperty("user.name"));
+		extent.setSystemInfo("Framework Name", "Selenium Java Framework");
+		extent.setSystemInfo("Author", "TunD20");
  
         return extent;
     }
@@ -56,15 +60,4 @@ public class ExtentManager {
 		return reportFileLocation;
     }
 
-
-    // private static final ExtentReports extentReports = new ExtentReports();
-
-    // public synchronized static ExtentReports getExtentReports() {
-    //     ExtentSparkReporter reporter = new ExtentSparkReporter("src/test/java/com/example/core/report/ExtentReport.html");
-    //     reporter.config().setReportName("Demo Extent Report");
-    //     extentReports.attachReporter(reporter);
-    //     extentReports.setSystemInfo("Framework Name", "Selenium Java Framework | TuND20");
-    //     extentReports.setSystemInfo("Author", "TuND20");
-    //     return extentReports;
-    // }
 }

@@ -1,12 +1,14 @@
 package com.example.core.utils.listeners;
 
 import com.aventstack.extentreports.Status;
-import com.example.core.utils.extentreports.ExtentManager;
+import com.aventstack.extentreports.markuputils.ExtentColor;
+import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.example.core.utils.extentreports.ExtentTestManager;
-import com.example.core.utils.logs.Log;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
+
+import static com.example.core.utils.extentreports.ExtentManager.getInstance;;
 
 public class ReportListener implements ITestListener {
 
@@ -18,92 +20,63 @@ public class ReportListener implements ITestListener {
         return result.getMethod().getDescription() != null ? result.getMethod().getDescription() : getTestName(result);
     }
 
-    public void onStart(ITestContext context) {
-		System.out.println("*** Test Suite " + context.getName() + " started ***");
-	}
-    
-    // @Override
-    // public void onStart(ITestContext iTestContext) {
-    //     WebDriver driver = BaseTest.getDriver();
-    //     Log.info("Start testing " + iTestContext.getName());
-    //     iTestContext.setAttribute("WebDriver", driver);
-    // }
+    private synchronized String getSimpleClassName(ITestResult result) {
+        return result.getMethod().getRealClass().getSimpleName();
+    }
 
-	public void onFinish(ITestContext context) {
-		System.out.println(("*** Test Suite " + context.getName() + " ending ***"));
-		ExtentTestManager.endTest();
-		ExtentManager.getInstance().flush();
-	}
+    private synchronized void addExtentLabelToTest(ITestResult result) {
+        if (result.getStatus() == ITestResult.SUCCESS)
+            ExtentTestManager.getTest().pass(MarkupHelper.createLabel("Test Passed", ExtentColor.GREEN));
+        else if (result.getStatus() == ITestResult.FAILURE) {
+            ExtentTestManager.getTest().fail(MarkupHelper.createLabel("Test Failed", ExtentColor.RED));
+        } else
+            ExtentTestManager.getTest().skip(MarkupHelper.createLabel("Test Skipped", ExtentColor.ORANGE));
+    }
 
-	public void onTestStart(ITestResult result) {
-		System.out.println(("*** Running test method " + result.getMethod().getMethodName() + "..."));
-		ExtentTestManager.startTest(result.getMethod().getMethodName());
-	}
+    @Override
+    public void onStart(ITestContext iTestContext) {
+        System.out.println("---------Start testing " + iTestContext.getName() + " ---------");
+    }
 
-	public void onTestSuccess(ITestResult result) {
-		System.out.println("*** Executed " + result.getMethod().getMethodName() + " test successfully...");
-		ExtentTestManager.getTest().log(Status.PASS, "Test passed");
-	}
+    @Override
+    public void onFinish(ITestContext iTestContext) {
+        System.out.println("---------End testing " + iTestContext.getName() + " ---------");
+        getInstance().flush();
+    }
 
-	public void onTestFailure(ITestResult result) {
-        Log.error(getTestName(result) + " test is failed.");
-        ExtentTestManager.addScreenShot(Status.FAIL, getTestName(result));
-        ExtentTestManager.logMessage(Status.FAIL, getTestDescription(result));
-	}
+    @Override
+    public void onTestStart(ITestResult iTestResult) {
+        System.out.println("--------- Executing :- " + getTestName(iTestResult) + " ---------");
+        ExtentTestManager.startTest(iTestResult.getMethod().getMethodName()); //"Extent Report By TuND20"
+        ExtentTestManager.setCategoryName(getSimpleClassName(iTestResult));
+    }
 
-	public void onTestSkipped(ITestResult result) {
-		System.out.println("*** Test " + result.getMethod().getMethodName() + " skipped...");
-		ExtentTestManager.getTest().log(Status.SKIP, "Test Skipped");
-	}
+    @Override
+    public void onTestSuccess(ITestResult iTestResult) {
+        System.out.println(getTestName(iTestResult) + " test is passed.");
+        ExtentTestManager.getTest().assignCategory(getSimpleClassName(iTestResult));
+        addExtentLabelToTest(iTestResult);
+        ExtentTestManager.endTest();
+    }
 
-	public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-		System.out.println("*** Test failed but within percentage % " + result.getMethod().getMethodName());
-	}
+    @Override
+    public void onTestFailure(ITestResult iTestResult) {
+        System.out.println(getTestName(iTestResult) + " test is failed.");
+        ExtentTestManager.getTest().assignCategory(getSimpleClassName(iTestResult));
+        ExtentTestManager.addScreenShot(Status.FAIL, getTestName(iTestResult));
+        ExtentTestManager.getTest().log(Status.FAIL, iTestResult.getName() + " Test is failed" +iTestResult.getThrowable());
+        addExtentLabelToTest(iTestResult);
+        ExtentTestManager.endTest();
 
-    // @Override
-    // public void onStart(ITestContext iTestContext) {
-    //     WebDriver driver = BaseTest.getDriver();
-    //     Log.info("Start testing " + iTestContext.getName());
-    //     iTestContext.setAttribute("WebDriver", driver);
-    // }
+    }
 
-    // @Override
-    // public void onFinish(ITestContext iTestContext) {
-    //     Log.info("End testing " + iTestContext.getName());
-    //     //Kết thúc và thực thi Extents Report
-    //     ExtentManager.getInstance().flush();
-    // }
+    @Override
+    public void onTestSkipped(ITestResult iTestResult) {
+        ExtentTestManager.getTest().log(Status.SKIP, iTestResult.getName() + " Test is Skipped" +  iTestResult.getThrowable());
+    }
 
-    // @Override
-    // public void onTestStart(ITestResult iTestResult) {
-    //     Log.info(getTestName(iTestResult) + " test is starting...");
-    //     ExtentTestManager.startTest(iTestResult.getMethod().getMethodName());
-    // }
-
-    // @Override
-    // public void onTestSuccess(ITestResult iTestResult) {
-    //     Log.info(getTestName(iTestResult) + " test is passed.");
-    //     //ExtentReports log operation for passed tests.
-    //     ExtentTestManager.logMessage(Status.PASS, getTestDescription(iTestResult));
-    // }
-
-    // @Override
-    // public void onTestFailure(ITestResult iTestResult) {
-    //     Log.error(getTestName(iTestResult) + " test is failed.");
-
-    //     ExtentTestManager.addScreenShot(Status.FAIL, getTestName(iTestResult));
-    //     ExtentTestManager.logMessage(Status.FAIL, getTestDescription(iTestResult));
-    // }
-
-    // @Override
-    // public void onTestSkipped(ITestResult iTestResult) {
-    //     Log.warn(getTestName(iTestResult) + " test is skipped.");
-    //     ExtentTestManager.logMessage(Status.SKIP, getTestName(iTestResult) + " test is skipped.");
-    // }
-
-    // @Override
-    // public void onTestFailedButWithinSuccessPercentage(ITestResult iTestResult) {
-    //     Log.error("Test failed but it is in defined success ratio " + getTestName(iTestResult));
-    //     ExtentTestManager.logMessage(Status.INFO, "Test failed but it is in defined success ratio " + getTestName(iTestResult));
-    // }
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult iTestResult) {
+        ExtentTestManager.logMessage(Status.INFO, "Test failed but it is in defined success ratio " + iTestResult.getMethod().getMethodName());
+    }
 }
