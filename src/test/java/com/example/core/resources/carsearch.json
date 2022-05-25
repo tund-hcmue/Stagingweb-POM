@@ -1,0 +1,20 @@
+[
+    {
+        "year": "2021",
+        "make": "BMW",
+        "model": "X3",
+        "zipcode": "12345"
+    },
+    {
+        "year": "2010",
+        "make": "BMW",
+        "model": "Z4",
+        "zipcode": "12345"
+    },
+    {
+        "year": "2015",
+        "make": "Honda",
+        "model": "CR-V",
+        "zipcode": "12345"
+    }
+]
